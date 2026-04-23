@@ -1,4 +1,4 @@
-# 🤖 AI Dev Agent
+#  AI Dev Agent
 
 An intelligent coding agent that understands your codebase, fixes bugs, refactors code, and explains architecture.
 
