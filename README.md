@@ -23,16 +23,16 @@
 
 | Feature | Description |
 |---------|-------------|
-| 🧠 **Context-Aware Fixes** | AST parsing for Python, JS, TS gives the agent deep code understanding |
-| 🔍 **Vector Memory** | ChromaDB-backed semantic search across your entire codebase |
-| 🤖 **Multi-Provider LLM** | Claude, OpenAI GPT-4, or Ollama (local) — switchable via one env var |
-| ⚡ **Sub-second Caching** | Redis caches repeat predictions for 1-hour TTL |
-| 🔐 **Secure API** | API-key auth + rate limiting on all endpoints |
-| 📡 **Real-time Streaming** | WebSocket + SSE token streaming for live output |
-| 🛠️ **CLI Interface** | Rich terminal UI: `agent fix`, `agent explain`, `agent chat` |
-| 📊 **Prometheus Metrics** | `/metrics` endpoint ready for Grafana dashboards |
-| 🚀 **Kubernetes Ready** | HPA autoscaling, liveness/readiness probes, Docker support |
-| 🔄 **CI/CD Pipeline** | GitHub Actions: test → security scan → Docker build |
+| **Context-Aware Fixes** | AST parsing for Python, JS, TS gives the agent deep code understanding |
+| **Vector Memory** | ChromaDB-backed semantic search across your entire codebase |
+| **Multi-Provider LLM** | Claude, OpenAI GPT-4, or Ollama (local) — switchable via one env var |
+| **Sub-second Caching** | Redis caches repeat predictions for 1-hour TTL |
+| **Secure API** | API-key auth + rate limiting on all endpoints |
+| **Real-time Streaming** | WebSocket + SSE token streaming for live output |
+| **CLI Interface** | Rich terminal UI: `agent fix`, `agent explain`, `agent chat` |
+| **Prometheus Metrics** | `/metrics` endpoint ready for Grafana dashboards |
+| **Kubernetes Ready** | HPA autoscaling, liveness/readiness probes, Docker support |
+| **CI/CD Pipeline** | GitHub Actions: test → security scan → Docker build |
 
 ---
 
@@ -122,7 +122,7 @@ dev-za-ai/
 
 Switch providers by setting `LLM_PROVIDER` in your `.env` file. No code changes required.
 
-### Option 1 — Claude (Anthropic) ⭐ Recommended
+### Option 1 — Claude (Anthropic) [Recommended]
 
 ```bash
 LLM_PROVIDER=claude
@@ -143,7 +143,7 @@ EMBEDDING_MODEL=text-embedding-3-small
 
 Best for: embeddings, familiarity, wide ecosystem support.
 
-### Option 3 — Ollama (Local / Offline) 🔒 Privacy-first
+### Option 3 — Ollama (Local / Offline) [Privacy-first]
 
 ```bash
 LLM_PROVIDER=ollama

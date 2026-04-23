@@ -2,7 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import './index.css';
 
 const REPO = 'https://github.com/Reaobaka56/dev-za-ai';
-const API_BASE = 'http://localhost:8000';
+
+// Reads VITE_API_BASE_URL at build time.
+// Locally: set in frontend/.env  (copy from .env.example)
+// Vercel:  set in Project Settings > Environment Variables
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
 
 const PRESETS = ['Fix my useState bug', 'Explain async/await', 'Refactor this function', 'Debug a 404 error'];
 
