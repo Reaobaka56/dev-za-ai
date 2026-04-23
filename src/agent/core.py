@@ -7,12 +7,13 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
-from .llm import LLMClient, Message, MockLLMClient
+from .llm import LLMClient, Message, MockLLMClient, create_llm_client
 from .tools import (
-    FileTools, TerminalTools, GitTools, 
+    FileTools, TerminalTools, GitTools,
     ToolResult, TOOL_SCHEMAS
 )
 from .memory import AgentMemory, SimpleMemory
+from .vectordb import VectorDB
 from .code_parser import CodeParser
 
 
@@ -68,13 +69,16 @@ When refactoring:
 - Follow language best practices
 """
 
-    def __init__(self, 
+    def __init__(self,
                  root_dir: str = ".",
-                 llm_client: Optional[LLMClient] = None,
-                 memory: Optional[AgentMemory] = None):
+                 llm_client=None,
+                 memory: Optional[AgentMemory] = None,
+                 vectordb: Optional[VectorDB] = None):
         self.root_dir = Path(root_dir).resolve()
-        self.llm = llm_client or LLMClient()
+        # Auto-select LLM provider from LLM_PROVIDER env var (openai|claude|ollama)
+        self.llm = llm_client or create_llm_client()
         self.memory = memory or AgentMemory(llm_client=self.llm)
+        self.vectordb = vectordb or VectorDB(collection="codebase")
         self.file_tools = FileTools(str(self.root_dir))
         self.terminal = TerminalTools(str(self.root_dir))
         self.git = GitTools(str(self.root_dir))
@@ -247,16 +251,23 @@ Provide a comprehensive answer with code references."""
             return ToolResult(False, "", str(e))
 
     async def index_project(self, directory: str = ".") -> Dict[str, Any]:
-        """Index the project into memory."""
-        result = await self.memory.index_project(directory)
-        return result
+        """Index the project into both AgentMemory and VectorDB."""
+        memory_result = await self.memory.index_project(directory)
+        return {"memory": memory_result, "vectordb": self.vectordb.stats()}
 
     async def search_memory(self, query: str, n: int = 5) -> List[Dict]:
-        """Search the memory for relevant code."""
+        """Search semantic memory for relevant code chunks."""
         return await self.memory.search(query, n)
 
+    async def vector_search(self, query_embedding: List[float], n: int = 5):
+        """Direct vector search via VectorDB layer."""
+        return await self.vectordb.search(query_embedding, n=n)
+
     def get_memory_stats(self) -> Dict[str, Any]:
-        return self.memory.get_stats()
+        return {
+            "memory": self.memory.get_stats(),
+            "vectordb": self.vectordb.stats(),
+        }
 
 
 class SimpleAgent:
