@@ -1,0 +1,30 @@
+# AI Dev Agent Configuration
+
+llm:
+  model: gpt-4o-mini
+  temperature: 0.1
+  max_tokens: 4096
+
+memory:
+  provider: chromadb  # chromadb | pinecone | weaviate
+  persist_dir: ./chroma_db
+  collection_name: codebase
+  embedding_model: text-embedding-3-small
+
+parser:
+  chunk_size: 50
+  languages:
+    - python
+    - javascript
+    - typescript
+
+agent:
+  max_iterations: 10
+  auto_commit: true
+  test_on_fix: true
+
+server:
+  host: 0.0.0.0
+  port: 8000
+  cors_origins:
+    - "*"
