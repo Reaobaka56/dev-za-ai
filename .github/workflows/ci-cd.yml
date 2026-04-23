@@ -1,0 +1,64 @@
+name: Enterprise AI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov black flake8 bandit
+        
+    - name: Lint with Flake8
+      run: |
+        flake8 src tests app.py --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 src tests app.py --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        
+    - name: Security scan with Bandit
+      run: |
+        bandit -r src app.py -ll
+        
+    - name: Run tests with pytest
+      run: |
+        pytest tests/ --cov=src --cov=app --cov-report=xml
+        
+  build-and-deploy:
+    needs: test-and-lint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker image
+      run: |
+        docker build -t ml-model:${{ github.sha }} .
+        docker tag ml-model:${{ github.sha }} ml-model:latest
+        
+    # Example placeholder for pushing to registry and deploying
+    # - name: Push to Container Registry
+    #   run: |
+    #     echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    #     docker push ghcr.io/${{ github.repository }}/ml-model:${{ github.sha }}
+    
+    # - name: Deploy to Kubernetes
+    #   run: |
+    #     kubectl set image deployment/ml-model-api model=ghcr.io/${{ github.repository }}/ml-model:${{ github.sha }}
+    #     kubectl rollout status deployment/ml-model-api
